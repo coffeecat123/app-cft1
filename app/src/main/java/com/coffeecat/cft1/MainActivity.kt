@@ -163,6 +163,15 @@ class MainActivity : ComponentActivity() {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotification(taskList: String) {
+        val deleteIntent = Intent(this, NotificationReceiver::class.java).apply {
+            putExtra("task_list", taskList)
+        }
+        val deletePendingIntent = android.app.PendingIntent.getBroadcast(
+            this,
+            0,
+            deleteIntent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
         val notificationManager = NotificationManagerCompat.from(this)
         val notification = NotificationCompat.Builder(this, "task_notification_channel")
             .setSmallIcon(android.R.drawable.ic_menu_info_details)
@@ -171,6 +180,7 @@ class MainActivity : ComponentActivity() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(taskList))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
+            .setDeleteIntent(deletePendingIntent)
             .build()
 
         notificationManager.notify(1, notification)
